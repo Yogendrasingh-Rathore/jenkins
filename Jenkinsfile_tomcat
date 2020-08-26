@@ -1,0 +1,29 @@
+pipeline {
+   agent any
+   tools {
+      maven "mvn3.6"
+   }
+   
+   stages {
+       stage('clone code') {
+          steps{
+              git 'https://github.com/Yogendrasingh-Rathore/simple-java-maven-app.git'
+          }          
+      }
+
+      stage('build'){
+          steps{
+              sh "mvn clean install"
+          }
+      }
+      
+      stage('deploy-to-tomcat'){
+          steps{
+              sshagent(['deploy_user']){
+                  sh "scp -o StrictHostKeyChecking=no webapp/target/webapp.war ec2_user@14.229.183.122:/opt/apache-tomcat-8.5.55/webapp"
+              }
+          }
+      }
+
+   }
+}
